@@ -21,7 +21,7 @@ myDIO2=myTree.getNode("GPI.APD_ARRAY.HARDWARE:DIO2")
 myTree.tcl('do /meth '+myDIO2.getFullPath()+' init')
 
 
-myACQ132=myTree.getNode("GPI.APD_ARRAY.HARDWARE:DT132_3")
+myACQ132=myTree.getNode("GPI.APD_ARRAY.HARDWARE:DT132_2")
 inst_ACQ132=ACQ132(myACQ132)
 inst_ACQ132.initftp()
 
