@@ -21,7 +21,7 @@ myDIO2=myTree.getNode("GPI.APD_ARRAY.HARDWARE:DIO2")
 myTree.tcl('do /meth '+myDIO2.getFullPath()+' init')
 
 
-myACQ132=myTree.getNode("GPI.APD_ARRAY.HARDWARE:DT132_3")
+myACQ132=myTree.getNode("GPI.APD_ARRAY.HARDWARE:DT132_2")
 inst_ACQ132=ACQ132(myACQ132)
 inst_ACQ132.initftp()
 
@@ -31,6 +31,7 @@ time.sleep(7)
 
 #Trigger DIO2 in order to start the data acquisition
 myTree.tcl('do /meth '+myDIO2.getFullPath()+' trigger')
+#myTree.getNode('GPI.APD_ARRAY.HARDWARE:eng_encoder').doMethod("set_event","SPECTROSCOPY_START") #Should work with Trig.mode=event in the device setup of DIO2 - put a spectroscopy start MDSplus event on the CPCI network
 
 #Wait for shot to end
 time.sleep(7)
