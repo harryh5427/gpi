@@ -18,12 +18,18 @@ myTree.createPulse(s) #Copies the model tree
 myTree=Tree("spectroscopy",s)
 myDIO2=myTree.getNode("GPI.APD_ARRAY.HARDWARE:DIO2")
 
+#Initialize DIO2 through TCL command, since there is no working python command for DIO2
+#DIO2_ENCDEC does not work for this, neither does DIO4
 myTree.tcl('do /meth '+myDIO2.getFullPath()+' init')
 
+#Take node of each digitizer, and initialize them
+myACQ132_2=myTree.getNode("GPI.APD_ARRAY.HARDWARE:DT132_2")
+inst_ACQ132_2=ACQ132(myACQ132_2)
+inst_ACQ132_2.initftp()
 
-myACQ132=myTree.getNode("GPI.APD_ARRAY.HARDWARE:DT132_2")
-inst_ACQ132=ACQ132(myACQ132)
-inst_ACQ132.initftp()
+myACQ132_3=myTree.getNode("GPI.APD_ARRAY.HARDWARE:DT132_3")
+inst_ACQ132_3=ACQ132(myACQ132_3)
+inst_ACQ132_3.initftp()
 
 
 #Wait for the initialization
@@ -37,4 +43,5 @@ myTree.tcl('do /meth '+myDIO2.getFullPath()+' trigger')
 time.sleep(7)
 
 #Store data to the MDSplus tree
-inst_ACQ132.store()
+inst_ACQ132_3.store()
+inst_ACQ132_2.store()
