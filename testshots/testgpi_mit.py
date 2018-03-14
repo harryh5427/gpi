@@ -9,6 +9,7 @@ Harry Han, Feb 27, 2018
 """
 from MDSplus import *
 from MitDevices.acq132 import ACQ132
+from MitDevices.acq196ao import ACQ196AO
 import sys
 import time
 
@@ -22,15 +23,24 @@ myDIO2=myTree.getNode("GPI.APD_ARRAY.HARDWARE:DIO2")
 #DIO2_ENCDEC does not work for this, neither does DIO4
 myTree.tcl('do /meth '+myDIO2.getFullPath()+' init')
 
+print("Initialized DIO2")
+
 #Take node of each digitizer, and initialize them
-myACQ132_2=myTree.getNode("GPI.APD_ARRAY.HARDWARE:DT132_2")
-inst_ACQ132_2=ACQ132(myACQ132_2)
-inst_ACQ132_2.initftp()
+#myACQ132_2=myTree.getNode("GPI.APD_ARRAY.HARDWARE:DT132_2")
+#inst_ACQ132_2=ACQ132(myACQ132_2)
+#inst_ACQ132_2.initftp()
 
 myACQ132_3=myTree.getNode("GPI.APD_ARRAY.HARDWARE:DT132_3")
 inst_ACQ132_3=ACQ132(myACQ132_3)
 inst_ACQ132_3.initftp()
 
+print("Initialized ACQ132_3")
+
+myACQ196=myTree.getNode("GPI.APD_ARRAY.HARDWARE:DT196")
+inst_ACQ196=ACQ196AO(myACQ196)
+inst_ACQ196.init()
+
+print("Initialized ACQ196")
 
 #Wait for the initialization
 time.sleep(7)
@@ -39,9 +49,15 @@ time.sleep(7)
 myTree.tcl('do /meth '+myDIO2.getFullPath()+' trigger')
 #myTree.getNode('GPI.APD_ARRAY.HARDWARE:eng_encoder').doMethod("set_event","SPECTROSCOPY_START") #Should work with Trig.mode=event in the device setup of DIO2 - put a spectroscopy start MDSplus event on the CPCI network
 
+print("Triggered DIO2")
+
 #Wait for shot to end
 time.sleep(7)
 
 #Store data to the MDSplus tree
 inst_ACQ132_3.store()
-inst_ACQ132_2.store()
+
+print("Stored data on ACQ132_3")
+
+#inst_ACQ132_2.store()
+
