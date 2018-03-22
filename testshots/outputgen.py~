@@ -10,7 +10,6 @@ Harry Han, Feb 27, 2018
 from MDSplus import *
 from MitDevices.acq132 import ACQ132
 from MitDevices.acq196 import ACQ196
-from MitDevices.acq196ao import ACQ196AO
 import sys
 import time
 
@@ -43,12 +42,6 @@ inst_ACQ196.initftp()
 
 print("Initialized ACQ196")
 
-myACQ196AO=myTree.getNode("GPI.APD_ARRAY.HARDWARE:ACQ196AO")
-inst_ACQ196AO=ACQ196AO(myACQ196AO)
-inst_ACQ196AO.init()
-
-print("Initialized ACQ196AO")
-
 #Wait for the initialization
 time.sleep(7)
 
@@ -68,5 +61,3 @@ print("Triggered DIO2")
 
 #inst_ACQ132_2.store()
 
-inst_ACQ196.store()
-print("Stored data on ACQ196")
