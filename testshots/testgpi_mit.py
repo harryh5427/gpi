@@ -59,7 +59,7 @@ myTree.tcl('do /meth '+myDIO2.getFullPath()+' trigger')
 print("Triggered DIO2")
 
 #Wait for shot to end
-#time.sleep(7)
+time.sleep(7)
 
 #Store data to the MDSplus tree
 #inst_ACQ132_3.store()
