@@ -11,6 +11,7 @@ from MDSplus import *
 from MitDevices.acq132 import ACQ132
 from MitDevices.acq196 import ACQ196
 from MitDevices.acq196ao import ACQ196AO
+import numpy as np
 import sys
 import time
 
@@ -62,11 +63,36 @@ print("Triggered DIO2")
 time.sleep(7)
 
 #Store data to the MDSplus tree
-#inst_ACQ132_3.store()
+inst_ACQ132_3.store()
 
-#print("Stored data on ACQ132_3")
+print("Stored data on ACQ132_3")
 
 #inst_ACQ132_2.store()
 
 inst_ACQ196.store()
 print("Stored data on ACQ196")
+
+for i in range (1,17):
+    if i < 10:
+        node_HV_prog=myTree.getNode("GPI.APD_ARRAY.HARDWARE:ACQ196AO.OUTPUT_0"+str(i))
+        node_HV_meas=myTree.getNode("GPI.APD_ARRAY.HARDWARE:ACQ196.INPUT_0"+str(i))
+    else:
+        node_HV_prog=myTree.getNode("GPI.APD_ARRAY.HARDWARE:ACQ196AO.OUTPUT_"+str(i))
+        node_HV_meas=myTree.getNode("GPI.APD_ARRAY.HARDWARE:ACQ196.INPUT_"+str(i))
+    HV_prog=np.mean(node_HV_prog.getData().data())
+    HV_meas=np.mean(node_HV_meas.getData().data())
+#    print("HV_prog for output "+str(i)+" : "+str(HV_prog))
+#    print("HV_meas for input "+str(i)+" : "+str(HV_meas))
+for i in range (17,33):
+    node_HV_meas=myTree.getNode("GPI.APD_ARRAY.HARDWARE:ACQ196.INPUT_"+str(i))
+    HV_meas=np.mean(node_HV_meas.getData().data())
+#    print("HV_meas for input "+str(i)+" : "+str(HV_meas))
+
+for i in range (1,33):
+    if i < 10:
+        node_sig=myTree.getNode("GPI.APD_ARRAY.HARDWARE:DT132_3.INPUT_0"+str(i))
+    else:
+        node_sig=myTree.getNode("GPI.APD_ARRAY.HARDWARE:DT132_3.INPUT_"+str(i))
+    sig=np.mean(node_sig.getData().data())
+    print("Input "+str(i)+": "+str(sig))
+        
