@@ -9,7 +9,10 @@ from MDSplus import *
 myTree=Tree("spectroscopy",-1)
 
 #sig=myTree.tdiCompile("Build_Signal(0 : 10. : 1., *, 0 : .1 : .01)")
-sig=myTree.tdiCompile("Build_Signal([3.,3.,3.,3.,3.,3.,3.,3.,3.,3.,3.], *, 0 : .1 : .01)")
+#sig=myTree.tdiCompile("Build_Signal([3.,3.],*,[-1.,2.])")
+HV_prog=3.
+sig=myTree.tdiCompile("Build_Signal([0.,1.,1.,0.]*"+str(HV_prog)+",*,["+myTree.getNode("gpi.apd_array.hardware.DIO2.CHANNEL_4.TRIGGER_2").getFullPath()+","+myTree.getNode("gpi.apd_array.hardware.DIO2.CHANNEL_4.TRIGGER_2").getFullPath()+"+1.0,"+myTree.getNode("gpi.apd_array.T_STOP").getFullPath()+"+1.0,"+myTree.getNode("gpi.apd_array.T_STOP").getFullPath()+"+2.0])")
+
 for i in range (1,17):
     if i < 10:
         Output_node=myTree.getNode("gpi.apd_array.hardware:acq196ao.output_0"+str(i))

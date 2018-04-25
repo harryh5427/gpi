@@ -14,6 +14,7 @@ from MitDevices.acq196ao import ACQ196AO
 import numpy as np
 import sys
 import time
+import matplotlib.pyplot as plt
 
 s=int(sys.argv[1])
 myTree=Tree("spectroscopy",-1)
@@ -28,9 +29,11 @@ myTree.tcl('do /meth '+myDIO2.getFullPath()+' init')
 print("Initialized DIO2")
 
 #Take node of each digitizer, and initialize them
-#myACQ132_2=myTree.getNode("GPI.APD_ARRAY.HARDWARE:DT132_2")
-#inst_ACQ132_2=ACQ132(myACQ132_2)
-#inst_ACQ132_2.initftp()
+myACQ132_1=myTree.getNode("GPI.APD_ARRAY.HARDWARE:DT132_1")
+inst_ACQ132_1=ACQ132(myACQ132_1)
+inst_ACQ132_1.initftp()
+
+print("Initialized ACQ132_1")
 
 myACQ132_3=myTree.getNode("GPI.APD_ARRAY.HARDWARE:DT132_3")
 inst_ACQ132_3=ACQ132(myACQ132_3)
@@ -63,11 +66,11 @@ print("Triggered DIO2")
 time.sleep(7)
 
 #Store data to the MDSplus tree
+inst_ACQ132_1.store()
+print("Stored data on ACQ132_1")
+
 inst_ACQ132_3.store()
-
 print("Stored data on ACQ132_3")
-
-#inst_ACQ132_2.store()
 
 inst_ACQ196.store()
 print("Stored data on ACQ196")
@@ -95,4 +98,12 @@ for i in range (1,33):
         node_sig=myTree.getNode("GPI.APD_ARRAY.HARDWARE:DT132_3.INPUT_"+str(i))
     sig=np.mean(node_sig.getData().data())
     print("Input "+str(i)+": "+str(sig))
-        
+    signal=node_sig.getData().data()
+    t=node_sig.dim_of().data()
+    plt.plot(t,signal)
+    plt.xlabel('Time (sec)')
+    plt.ylabel('Signal (V)')
+
+plt.show()
+    
+

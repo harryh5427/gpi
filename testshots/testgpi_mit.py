@@ -14,6 +14,7 @@ from MitDevices.acq196ao import ACQ196AO
 import numpy as np
 import sys
 import time
+import matplotlib.pyplot as plt
 
 s=int(sys.argv[1])
 myTree=Tree("spectroscopy",-1)
@@ -28,9 +29,11 @@ myTree.tcl('do /meth '+myDIO2.getFullPath()+' init')
 print("Initialized DIO2")
 
 #Take node of each digitizer, and initialize them
-#myACQ132_2=myTree.getNode("GPI.APD_ARRAY.HARDWARE:DT132_2")
-#inst_ACQ132_2=ACQ132(myACQ132_2)
-#inst_ACQ132_2.initftp()
+myACQ132_1=myTree.getNode("GPI.APD_ARRAY.HARDWARE:DT132_1")
+inst_ACQ132_1=ACQ132(myACQ132_1)
+inst_ACQ132_1.initftp()
+
+print("Initialized ACQ132_1")
 
 myACQ132_3=myTree.getNode("GPI.APD_ARRAY.HARDWARE:DT132_3")
 inst_ACQ132_3=ACQ132(myACQ132_3)
@@ -63,11 +66,11 @@ print("Triggered DIO2")
 time.sleep(7)
 
 #Store data to the MDSplus tree
+inst_ACQ132_1.store()
+print("Stored data on ACQ132_1")
+
 inst_ACQ132_3.store()
-
 print("Stored data on ACQ132_3")
-
-#inst_ACQ132_2.store()
 
 inst_ACQ196.store()
 print("Stored data on ACQ196")
@@ -81,12 +84,12 @@ for i in range (1,17):
         node_HV_meas=myTree.getNode("GPI.APD_ARRAY.HARDWARE:ACQ196.INPUT_"+str(i))
     HV_prog=np.mean(node_HV_prog.getData().data())
     HV_meas=np.mean(node_HV_meas.getData().data())
-#    print("HV_prog for output "+str(i)+" : "+str(HV_prog))
-#    print("HV_meas for input "+str(i)+" : "+str(HV_meas))
+    print("HV_prog for output "+str(i)+" : "+str(HV_prog))
+    print("HV_meas for input "+str(i)+" : "+str(HV_meas))
 for i in range (17,33):
     node_HV_meas=myTree.getNode("GPI.APD_ARRAY.HARDWARE:ACQ196.INPUT_"+str(i))
     HV_meas=np.mean(node_HV_meas.getData().data())
-#    print("HV_meas for input "+str(i)+" : "+str(HV_meas))
+    print("HV_meas for input "+str(i)+" : "+str(HV_meas))
 
 for i in range (1,33):
     if i < 10:
@@ -95,4 +98,12 @@ for i in range (1,33):
         node_sig=myTree.getNode("GPI.APD_ARRAY.HARDWARE:DT132_3.INPUT_"+str(i))
     sig=np.mean(node_sig.getData().data())
     print("Input "+str(i)+": "+str(sig))
-        
+    signal=node_sig.getData().data()
+    t=node_sig.dim_of().data()
+    plt.plot(t,signal)
+    plt.xlabel('Time (sec)')
+    plt.ylabel('Signal (V)')
+
+plt.show()
+    
+
