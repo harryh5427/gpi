@@ -29,28 +29,34 @@ myTree.tcl('do /meth '+myDIO2.getFullPath()+' init')
 print("Initialized DIO2")
 
 #Take node of each digitizer, and initialize them
-myACQ132_1=myTree.getNode("GPI.APD_ARRAY.HARDWARE:DT132_1")
-inst_ACQ132_1=ACQ132(myACQ132_1)
-inst_ACQ132_1.initftp()
+#myACQ132_1=myTree.getNode("GPI.APD_ARRAY.HARDWARE:DT132_1")
+#inst_ACQ132_1=ACQ132(myACQ132_1)
+#inst_ACQ132_1.initftp()
+#print("Initialized ACQ132_1")
 
-print("Initialized ACQ132_1")
+#myACQ132_2=myTree.getNode("GPI.APD_ARRAY.HARDWARE:DT132_2")
+#inst_ACQ132_2=ACQ132(myACQ132_2)
+#inst_ACQ132_2.initftp()
+#print("Initialized ACQ132_2")
 
-myACQ132_3=myTree.getNode("GPI.APD_ARRAY.HARDWARE:DT132_3")
-inst_ACQ132_3=ACQ132(myACQ132_3)
-inst_ACQ132_3.initftp()
+#myACQ132_3=myTree.getNode("GPI.APD_ARRAY.HARDWARE:DT132_3")
+#inst_ACQ132_3=ACQ132(myACQ132_3)
+#inst_ACQ132_3.initftp()
+#print("Initialized ACQ132_3")
 
-print("Initialized ACQ132_3")
+#myACQ132_4=myTree.getNode("GPI.INNER_APD.HARDWARE:ACQ132_4")
+#inst_ACQ132_4=ACQ132(myACQ132_4)
+#inst_ACQ132_4.initftp()
+#print("Initialized ACQ132_4")
 
 myACQ196=myTree.getNode("GPI.APD_ARRAY.HARDWARE:ACQ196")
 inst_ACQ196=ACQ196(myACQ196)
 inst_ACQ196.initftp()
-
 print("Initialized ACQ196")
 
 myACQ196AO=myTree.getNode("GPI.APD_ARRAY.HARDWARE:ACQ196AO")
 inst_ACQ196AO=ACQ196AO(myACQ196AO)
 inst_ACQ196AO.init()
-
 print("Initialized ACQ196AO")
 
 #Wait for the initialization
@@ -66,15 +72,21 @@ print("Triggered DIO2")
 time.sleep(7)
 
 #Store data to the MDSplus tree
-inst_ACQ132_1.store()
-print("Stored data on ACQ132_1")
+#inst_ACQ132_1.store()
+#print("Stored data on ACQ132_1")
 
-inst_ACQ132_3.store()
-print("Stored data on ACQ132_3")
+#inst_ACQ132_2.store()
+#print("Stored data on ACQ132_2")
 
-inst_ACQ196.store()
-print("Stored data on ACQ196")
+#inst_ACQ132_3.store()
+#print("Stored data on ACQ132_3")
 
+#inst_ACQ132_4.store()
+#print("Stored data on ACQ132_4")
+
+#inst_ACQ196.store()
+#print("Stored data on ACQ196")
+"""
 for i in range (1,17):
     if i < 10:
         node_HV_prog=myTree.getNode("GPI.APD_ARRAY.HARDWARE:ACQ196AO.OUTPUT_0"+str(i))
@@ -82,7 +94,7 @@ for i in range (1,17):
     else:
         node_HV_prog=myTree.getNode("GPI.APD_ARRAY.HARDWARE:ACQ196AO.OUTPUT_"+str(i))
         node_HV_meas=myTree.getNode("GPI.APD_ARRAY.HARDWARE:ACQ196.INPUT_"+str(i))
-    HV_prog=np.mean(node_HV_prog.getData().data())
+    HV_prog=max(node_HV_prog.getData().data())
     HV_meas=np.mean(node_HV_meas.getData().data())
     print("HV_prog for output "+str(i)+" : "+str(HV_prog))
     print("HV_meas for input "+str(i)+" : "+str(HV_meas))
@@ -91,19 +103,43 @@ for i in range (17,33):
     HV_meas=np.mean(node_HV_meas.getData().data())
     print("HV_meas for input "+str(i)+" : "+str(HV_meas))
 
-for i in range (1,33):
-    if i < 10:
-        node_sig=myTree.getNode("GPI.APD_ARRAY.HARDWARE:DT132_3.INPUT_0"+str(i))
+for i in range (1,3):
+    HV_meas=myTree.getNode("GPI.APD_ARRAY.HARDWARE:DT132_2.INPUT_0"+str(i)).getData().data()
+    t=myTree.getNode("GPI.APD_ARRAY.HARDWARE:DT132_2.INPUT_0"+str(i)).dim_of().data()
+    plt.plot(t,HV_meas)
+plt.xlabel('Time (sec)')
+plt.ylabel('HV_meas (V)')
+plt.ylim(0.,5.)
+plt.show()
+"""
+#for i in range (1,2):
+#    if i < 10:
+#        node_sig=myTree.getNode("GPI.APD_ARRAY.HARDWARE:DT132_3.INPUT_0"+str(i))
+#    else:
+#        node_sig=myTree.getNode("GPI.APD_ARRAY.HARDWARE:DT132_3.INPUT_"+str(i))
+#    sig=np.mean(node_sig.getData().data())
+#    print("Input "+str(i)+": "+str(sig))
+#    signal=node_sig.getData().data()
+#    t=node_sig.dim_of().data()
+#    plt.plot(t,signal)
+#    plt.xlabel('Time (sec)')
+#    plt.ylabel('Signal (V)')
+"""
+plt.xlabel('Time (sec)')
+plt.ylabel('Signal (V)')
+line=[]
+for i in range (1,5):
+    if i<4:
+        node_sig=myTree.getNode("GPI.APD_ARRAY.HARDWARE:DT132_"+str(i)+".INPUT_01")
     else:
-        node_sig=myTree.getNode("GPI.APD_ARRAY.HARDWARE:DT132_3.INPUT_"+str(i))
-    sig=np.mean(node_sig.getData().data())
-    print("Input "+str(i)+": "+str(sig))
+        node_sig=myTree.getNode("GPI.INNER_APD.HARDWARE:ACQ132_"+str(i)+".INPUT_01")
     signal=node_sig.getData().data()
     t=node_sig.dim_of().data()
-    plt.plot(t,signal)
-    plt.xlabel('Time (sec)')
-    plt.ylabel('Signal (V)')
+    line.append(plt.plot(t,signal,label="DT132_"+str(i)))
+
+plt.legend(line,('DT132_1','DT132_2','DT132_3','DT132_4'))
+plt.xlim([0.05,0.05003])
 
 plt.show()
-    
+"""    
 

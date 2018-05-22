@@ -1,0 +1,84 @@
+from MDSplus import *
+from MitDevices.acq132 import ACQ132
+import numpy as np
+import sys
+import time
+import matplotlib.pyplot as plt
+
+#start_shot=1180427501 #Shots with pxi connection and pulse
+#start_shot=1180430500 #Shots with lemo connection and pulse
+start_shot=1180430601 #Shots with lemo connection and square wave
+#start_shot=1180501501 #Shots with pxi trigger connection and square wave and lemo clock connection
+#start_shot=1180501601
+shots_not_aligned=[]
+largest_skip=[]
+
+f=open("sample_skip_test_"+str(start_shot)+".txt","w+")
+print("Shot#    first_mismatch_nskip    last_mismatch_nskip    first_mismatch_cycle    last_mismatch_cycle    first_mismatch_time    last_mismatch_time")
+f.write("Shot#    first_mismatch_nskip    last_mismatch_nskip    first_mismatch_cycle    last_mismatch_cycle    first_mismatch_time    last_mismatch_time")
+for i in range(0,100):
+#    start_inds_first=[]
+    end_inds_first=[]
+    down_leftedge_inds=[[],[],[],[]]
+    up_leftedge_inds=[[],[],[],[]]
+    s=start_shot+i
+    myTree=Tree("spectroscopy",s)
+
+    for n in range(1,4+1):
+        if n<4:
+            node_sig=myTree.getNode("GPI.APD_ARRAY.HARDWARE:DT132_"+str(n)+".INPUT_01")
+        else:
+            node_sig=myTree.getNode("GPI.INNER_APD.HARDWARE:ACQ132_"+str(n)+".INPUT_01")
+
+        sig=np.array(node_sig.getData().data())
+        t=np.array(node_sig.getData().getDimensionAt(0).data())
+        downs_inds=np.where(sig<0.1)[0]
+        ups_inds=np.where(sig>0.9)[0]
+        if downs_inds[0]!=0:
+            down_leftedge_inds[n-1].append(downs_inds[0])
+        elif ups_inds[0]!=0:
+            up_leftedge_inds[n-1].append(ups_inds[0])
+        for j in range(1,len(downs_inds)-1):
+            if downs_inds[j+1]-downs_inds[j]>1:
+                down_leftedge_inds[n-1].append(downs_inds[j+1])
+        for j in range(1,len(ups_inds)-1):
+            if ups_inds[j+1]-ups_inds[j]>1:
+                up_leftedge_inds[n-1].append(ups_inds[j+1])
+    down_leftedge_inds=np.array(down_leftedge_inds)
+    up_leftedge_inds=np.array(up_leftedge_inds)
+    for j in range(0,len(down_leftedge_inds[0])):
+        temp_down=[down_leftedge_inds[0][j],down_leftedge_inds[1][j],down_leftedge_inds[2][j],down_leftedge_inds[3][j]]
+        if np.any(temp_down!=temp_down[0]):
+            break
+    for k in range(0,len(up_leftedge_inds[0])):
+        temp_up=[up_leftedge_inds[0][k],up_leftedge_inds[1][k],up_leftedge_inds[2][k],up_leftedge_inds[3][k]]
+        if np.any(temp_up!=temp_up[0]):
+            break
+    if np.mean(temp_down)<np.mean(temp_up):
+        temp=temp_down
+    else:
+        temp=temp_up
+    first_mismatch_cycle=1+(j+k)/2
+    first_mismatch_nskip=max(np.diff(temp))
+    first_mismatch_time=t[temp[0]]
+    last_mismatch_ind_down=min([len(down_leftedge_inds[0][:]),len(down_leftedge_inds[1][:]),len(down_leftedge_inds[2][:]),len(down_leftedge_inds[3][:])])-1
+    last_mismatch_ind_up=min([len(up_leftedge_inds[0][:]),len(up_leftedge_inds[1][:]),len(up_leftedge_inds[2][:]),len(up_leftedge_inds[3][:])])-1
+    if len(down_leftedge_inds[0][:])>len(up_leftedge_inds[0][:]):
+        temp=[down_leftedge_inds[0][last_mismatch_ind_down],down_leftedge_inds[1][last_mismatch_ind_down],down_leftedge_inds[2][last_mismatch_ind_down],down_leftedge_inds[3][last_mismatch_ind_down]]
+        last_mismatch_time=t[down_leftedge_inds[0][last_mismatch_ind_down]]
+    else:
+        temp=[up_leftedge_inds[0][last_mismatch_ind_up],up_leftedge_inds[1][last_mismatch_ind_up],up_leftedge_inds[2][last_mismatch_ind_up],up_leftedge_inds[3][last_mismatch_ind_up]]
+        last_mismatch_time=t[up_leftedge_inds[0][last_mismatch_ind_up]]
+    last_mismatch_nskip=max(np.diff(temp))
+    last_mismatch_cycle=1+(last_mismatch_ind_down+last_mismatch_ind_up)/2
+    print(str(s)+"    "+str(first_mismatch_nskip)+"    "+str(last_mismatch_nskip)+"    "+str(first_mismatch_cycle)+"    "+str(last_mismatch_cycle)+"    "+str(first_mismatch_time)+"    "+str(last_mismatch_time))
+    f.write(str(s)+"    "+str(first_mismatch_nskip)+"    "+str(last_mismatch_nskip)+"    "+str(first_mismatch_cycle)+"    "+str(last_mismatch_cycle)+"    "+str(first_mismatch_time)+"    "+str(last_mismatch_time))
+    myTree.close()
+
+f.close()
+#print(str(len(shots_not_aligned))+" shots are not aligned: "+str(shots_not_aligned))
+#indices = [i for i, x in enumerate(largest_skip) if x == max(largest_skip)]
+#print("The largest skip is "+str(max(largest_skip))+" from "+str(len(indices))+" shots:")
+#for i in range(0,len(indices)):
+#    print(str(shots_not_aligned[indices[i]]))
+

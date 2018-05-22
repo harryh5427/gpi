@@ -81,7 +81,7 @@ node_control.getNode("FILTER").addNode("VALUE","text")
 node_control.getNode("FILTER.COMMENT").putData("values of filters: DA6563, HEI5876, HEI6670, HEII4686, OPEN")
 node_control.getNode("FILTER.VALUE").putData("HEI5876")
 
-#Add S_LAMBDA arrays for each filter. Brightness is obtained by multiplying S_LAMBDA with the inverse GAIN array and .
+#Add S_LAMBDA arrays for each filter. Brightness = (S_LAMBDA / GAIN_ARR) X (BACK_ARR-SIG_ARR)
 node_calib.addNode("S_L_DA6563","numeric")
 node_calib.addNode("S_L_HEI5876","numeric")
 node_calib.addNode("S_L_HEI6670","numeric")
@@ -179,7 +179,7 @@ filter_list=['DA6563','HEI5876','HEI6670','HEII4686','OPEN']
 for i in range (0,5):
     brt_arr=brt_arr+"IF(UPCASE("+node_control.getNode("FILTER.VALUE").getFullPath()+")=='"+filter_list[i]+"',_slambda="+node_calib.getNode("S_L_"+filter_list[i]).getFullPath()+"),"
 
-brt_arr=brt_arr+"_back_series=replicate([_back],2,size(_sig_series,0)),_gainxslambda_series=replicate([_gain*_slambda],2,size(_sig_series,0)),_brt_series=(-_sig_series+_back_series)*_gainxslambda_series"
+brt_arr=brt_arr+"_back_series=replicate([_back],2,size(_sig_series,0)),_sensitivity_series=replicate([_slambda/_gain],2,size(_sig_series,0)),_brt_series=(-_sig_series+_back_series)*_sensitivity_series"
 node_result.getNode("BRT_ARR").putData(myTree.tdiCompile(brt_arr))
 
 myTree.write() #save the edited tree
