@@ -21,19 +21,31 @@ plt.xlabel('Time (sec)')
 plt.ylabel('Signal (V)')
 line=[]
 det_exposed=[]
-for i in range (1,16):
+at_zero=[]
+digitizer_num=3
+for i in range (1,33):
     if i<10:
-        node_sig=myTree.getNode("GPI.APD_ARRAY.HARDWARE:DT132_1.INPUT_0"+str(i))
+        if digitizer_num<4:
+            node_sig=myTree.getNode("GPI.APD_ARRAY.HARDWARE:DT132_"+str(digitizer_num)+".INPUT_0"+str(i))
+        else:
+            node_sig=myTree.getNode("GPI.INNER_APD.HARDWARE:ACQ132_"+str(digitizer_num)+".INPUT_0"+str(i))
     else:
-        node_sig=myTree.getNode("GPI.APD_ARRAY.HARDWARE:DT132_1.INPUT_"+str(i))
+        if digitizer_num<4:
+            node_sig=myTree.getNode("GPI.APD_ARRAY.HARDWARE:DT132_"+str(digitizer_num)+".INPUT_"+str(i))
+        else:
+            node_sig=myTree.getNode("GPI.INNER_APD.HARDWARE:ACQ132_"+str(digitizer_num)+".INPUT_"+str(i))
     sig=node_sig.getData().data()
     t=node_sig.dim_of().data()
+    print(str(np.mean(sig)))
     if i!=16 and i!=17:# and np.mean(sig)<0.9:
         line.append(plt.plot(t,sig,label="DT132_"+str(i)))
         det_exposed.append(i)
+        if np.mean(sig)>-0.5:
+            at_zero.append(i)
 
 #plt.legend(line,('DT132_1','DT132_2','DT132_3','DT132_4'))
-plt.ylim(-3.,1.)
-print("det_exposed: "+str(det_exposed))
+plt.ylim(-2.,3.)
+#print("det_exposed: "+str(det_exposed))
+print("Channels at zero: "+str(at_zero))
 plt.show()
 

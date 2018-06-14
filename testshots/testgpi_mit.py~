@@ -29,35 +29,35 @@ myTree.tcl('do /meth '+myDIO2.getFullPath()+' init')
 print("Initialized DIO2")
 
 #Take node of each digitizer, and initialize them
-#myACQ132_1=myTree.getNode("GPI.APD_ARRAY.HARDWARE:DT132_1")
-#inst_ACQ132_1=ACQ132(myACQ132_1)
-#inst_ACQ132_1.initftp()
-#print("Initialized ACQ132_1")
+myACQ132_1=myTree.getNode("GPI.APD_ARRAY.HARDWARE:DT132_1")
+inst_ACQ132_1=ACQ132(myACQ132_1)
+inst_ACQ132_1.initftp()
+print("Initialized ACQ132_1")
 
-#myACQ132_2=myTree.getNode("GPI.APD_ARRAY.HARDWARE:DT132_2")
-#inst_ACQ132_2=ACQ132(myACQ132_2)
-#inst_ACQ132_2.initftp()
-#print("Initialized ACQ132_2")
+myACQ132_2=myTree.getNode("GPI.APD_ARRAY.HARDWARE:DT132_2")
+inst_ACQ132_2=ACQ132(myACQ132_2)
+inst_ACQ132_2.initftp()
+print("Initialized ACQ132_2")
 
-#myACQ132_3=myTree.getNode("GPI.APD_ARRAY.HARDWARE:DT132_3")
-#inst_ACQ132_3=ACQ132(myACQ132_3)
-#inst_ACQ132_3.initftp()
-#print("Initialized ACQ132_3")
+myACQ132_3=myTree.getNode("GPI.APD_ARRAY.HARDWARE:DT132_3")
+inst_ACQ132_3=ACQ132(myACQ132_3)
+inst_ACQ132_3.initftp()
+print("Initialized ACQ132_3")
 
 #myACQ132_4=myTree.getNode("GPI.INNER_APD.HARDWARE:ACQ132_4")
 #inst_ACQ132_4=ACQ132(myACQ132_4)
 #inst_ACQ132_4.initftp()
 #print("Initialized ACQ132_4")
 
-myACQ196=myTree.getNode("GPI.APD_ARRAY.HARDWARE:ACQ196")
-inst_ACQ196=ACQ196(myACQ196)
-inst_ACQ196.initftp()
-print("Initialized ACQ196")
+#myACQ196=myTree.getNode("GPI.APD_ARRAY.HARDWARE:ACQ196")
+#inst_ACQ196=ACQ196(myACQ196)
+#inst_ACQ196.initftp()
+#print("Initialized ACQ196")
 
-myACQ196AO=myTree.getNode("GPI.APD_ARRAY.HARDWARE:ACQ196AO")
-inst_ACQ196AO=ACQ196AO(myACQ196AO)
-inst_ACQ196AO.init()
-print("Initialized ACQ196AO")
+#myACQ196AO=myTree.getNode("GPI.APD_ARRAY.HARDWARE:ACQ196AO")
+#inst_ACQ196AO=ACQ196AO(myACQ196AO)
+#inst_ACQ196AO.init()
+#print("Initialized ACQ196AO")
 
 #Wait for the initialization
 time.sleep(7)
@@ -72,14 +72,14 @@ print("Triggered DIO2")
 time.sleep(7)
 
 #Store data to the MDSplus tree
-#inst_ACQ132_1.store()
-#print("Stored data on ACQ132_1")
+inst_ACQ132_1.store()
+print("Stored data on ACQ132_1")
 
-#inst_ACQ132_2.store()
-#print("Stored data on ACQ132_2")
+inst_ACQ132_2.store()
+print("Stored data on ACQ132_2")
 
-#inst_ACQ132_3.store()
-#print("Stored data on ACQ132_3")
+inst_ACQ132_3.store()
+print("Stored data on ACQ132_3")
 
 #inst_ACQ132_4.store()
 #print("Stored data on ACQ132_4")
@@ -103,14 +103,21 @@ for i in range (17,33):
     HV_meas=np.mean(node_HV_meas.getData().data())
     print("HV_meas for input "+str(i)+" : "+str(HV_meas))
 """
-for i in range (1,3):
-    HV_meas=myTree.getNode("GPI.APD_ARRAY.HARDWARE:DT132_2.INPUT_0"+str(i)).getData().data()
-    t=myTree.getNode("GPI.APD_ARRAY.HARDWARE:DT132_2.INPUT_0"+str(i)).dim_of().data()
-    plt.plot(t,HV_meas)
-plt.xlabel('Time (sec)')
-plt.ylabel('HV_meas (V)')
-plt.ylim(0.,5.)
-plt.show()
+"""
+for i in range (1,33):
+    if i<10:
+        HV_meas=myTree.getNode("GPI.INNER_APD.HARDWARE:ACQ132_4.INPUT_0"+str(i)).getData().data()
+        t=myTree.getNode("GPI.INNER_APD.HARDWARE:ACQ132_4.INPUT_0"+str(i)).dim_of().data()
+    else:
+        HV_meas=myTree.getNode("GPI.INNER_APD.HARDWARE:ACQ132_4.INPUT_"+str(i)).getData().data()
+        t=myTree.getNode("GPI.INNER_APD.HARDWARE:ACQ132_4.INPUT_"+str(i)).dim_of().data()
+#    plt.plot(t,HV_meas)
+    print('Input_'+str(i)+' : '+str(np.mean(HV_meas)))
+"""
+#plt.xlabel('Time (sec)')
+#plt.ylabel('HV_meas (V)')
+#plt.ylim(0.,5.)
+#plt.show()
 
 #for i in range (1,2):
 #    if i < 10:

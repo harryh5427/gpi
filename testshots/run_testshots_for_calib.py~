@@ -20,7 +20,7 @@ while True:
         break
 
 gpi_root="\SPECTROSCOPY::TOP.GPI_TCV"
-HV_prog=np.linspace(0.7,1.3,num_shot)
+HV_prog=np.linspace(2.5,4.5,num_shot)
 HV_meas=[[],[],[],[],[],[],[],[]]
 filter_list=['DA6563','HEI5876','HEI6670','HEII4686','OPEN']
 while True:
