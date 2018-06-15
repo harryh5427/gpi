@@ -35,11 +35,12 @@ modelTree_num=-1
 modelTree=Tree("spectroscopy",modelTree_num)
 
 for i in range (1,num_shot*2+1):
-    s=int(str(1)+now.strftime("%y%m%d")+str(500+i))
+    s=int(str(1)+now.strftime("%y%m%d")+str(600+i))
     print("Current shot number: "+str(s))
     modelTree.createPulse(s) #Copies the model tree
     myTree=Tree("spectroscopy",s)
     myTree.getNode(gpi_root+".APD_ARRAY.CONTROL.FILTER.VALUE").putData(filter_used)
+    myTree.getNode(gpi_root+".APD_ARRAY.CONTROL.DIG_TSTOP").putData(.3)
     if i<=num_shot:    
         HV_prog_i=random.choice(HV_prog)
         HV_prog=np.delete(HV_prog,np.where(HV_prog==HV_prog_i))
@@ -57,7 +58,7 @@ for i in range (1,num_shot*2+1):
     
     #Take node of each digitizer, and initialize them
     myACQ132_1=myTree.getNode(gpi_root+".APD_ARRAY.HARDWARE:ACQ132_1")
-    inst_ACQ132_1=ACQ132(myACQ132_2)
+    inst_ACQ132_1=ACQ132(myACQ132_1)
     inst_ACQ132_1.initftp()
     print("Initialized ACQ132_1")
     myACQ132_2=myTree.getNode(gpi_root+".APD_ARRAY.HARDWARE:ACQ132_2")
@@ -72,17 +73,17 @@ for i in range (1,num_shot*2+1):
     inst_ACQ132_4=ACQ132(myACQ132_4)
     inst_ACQ132_4.initftp()
     print("Initialized ACQ132_4")
-    myACQ196=myTree.getNode(gpi_root+".APD_ARRAY.HARDWARE:ACQ196")
-    inst_ACQ196=ACQ196(myACQ196)
-    inst_ACQ196.initftp()
-    print("Initialized ACQ196")
     myACQ196AO=myTree.getNode(gpi_root+".APD_ARRAY.HARDWARE:ACQ196AO")
     inst_ACQ196AO=ACQ196AO(myACQ196AO)
     inst_ACQ196AO.init()
     print("Initialized ACQ196AO")
-    
+    myACQ196=myTree.getNode(gpi_root+".APD_ARRAY.HARDWARE:ACQ196")
+    inst_ACQ196=ACQ196(myACQ196)
+    inst_ACQ196.initftp()
+    print("Initialized ACQ196")
+
     #Wait for the initialization
-    time.sleep(10)
+    time.sleep(5)
     
     #Trigger DIO2 in order to start the data acquisition
     myTree.tcl('do /meth '+myDIO2.getFullPath()+' trigger')
@@ -144,8 +145,8 @@ for i in range (1,num_shot*2+1):
     myTree.close()
 
 dummy_arr=sig_minus_back_arr #Just to copy the size of the array
-for i in range (0:12):
-    for j in range (0:10):
+for i in range (0,12):
+    for j in range (0,10):
         dummy_arr[i][j]=0.
 node_model_coef_0th=modelTree.getNode(gpi_root+".APD_ARRAY.CALIBRATION.COEF_0TH_ARR")
 node_model_coef_1st=modelTree.getNode(gpi_root+".APD_ARRAY.CALIBRATION.COEF_1ST_ARR")

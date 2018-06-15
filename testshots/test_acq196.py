@@ -8,7 +8,6 @@ python testgpi_mit.py 1180227500
 Harry Han, Feb 27, 2018
 """
 from MDSplus import *
-from MitDevices.acq132 import ACQ132
 from MitDevices.acq196 import ACQ196
 from MitDevices.acq196ao import ACQ196AO
 import numpy as np
@@ -29,11 +28,22 @@ myTree.tcl('do /meth '+myDIO2.getFullPath()+' init')
 print("Initialized DIO2")
 
 #Take node of each digitizer, and initialize them
-myACQ132_1=myTree.getNode("GPI.APD_ARRAY.HARDWARE:DT132_1")
-inst_ACQ132_1=ACQ132(myACQ132_1)
-inst_ACQ132_1.initftp()
-print("Initialized ACQ132_1")
 
+myACQ196AO=myTree.getNode("GPI.APD_ARRAY.HARDWARE:ACQ196AO")
+inst_ACQ196AO=ACQ196AO(myACQ196AO)
+inst_ACQ196AO.getstate()
+inst_ACQ196AO.init()
+print("Initialized ACQ196AO")
+
+myACQ196=myTree.getNode("GPI.APD_ARRAY.HARDWARE:ACQ196")
+inst_ACQ196=ACQ196(myACQ196)
+inst_ACQ196.initftp()
+print("Initialized ACQ196")
+
+#Wait for the initialization
+time.sleep(5)
+inst_ACQ196.getstate()
+"""
 myACQ196=myTree.getNode("GPI.APD_ARRAY.HARDWARE:ACQ196")
 inst_ACQ196=ACQ196(myACQ196)
 inst_ACQ196.initftp()
@@ -46,8 +56,9 @@ inst_ACQ196AO.init()
 print("Initialized ACQ196AO")
 
 #Wait for the initialization
-time.sleep(20)
-
+time.sleep(5)
+inst_ACQ196.getstate()
+"""
 #Trigger DIO2 in order to start the data acquisition
 myTree.tcl('do /meth '+myDIO2.getFullPath()+' trigger')
 #myTree.getNode('GPI.APD_ARRAY.HARDWARE:eng_encoder').doMethod("set_event","SPECTROSCOPY_START") #Should work with Trig.mode=event in the device setup of DIO2 - put a spectroscopy start MDSplus event on the CPCI network
@@ -59,22 +70,17 @@ time.sleep(20)
 inst_ACQ196.getstate()
 
 #Store data to the MDSplus tree
-inst_ACQ132_1.store()
-print("Stored data on ACQ132_1")
 inst_ACQ196.store()
 print("Stored data on ACQ196")
 inst_ACQ196.getstate()
 
-HV_prog=myTree.getNode("GPI.APD_ARRAY.HARDWARE:ACQ196AO.OUTPUT_01").getData().data()
-t_prog=myTree.getNode("GPI.APD_ARRAY.HARDWARE:ACQ196AO.OUTPUT_01").dim_of().data()
-HV_meas=myTree.getNode("GPI.APD_ARRAY.HARDWARE:ACQ196.INPUT_01").getData().data()
-t_meas=myTree.getNode("GPI.APD_ARRAY.HARDWARE:ACQ196.INPUT_01").dim_of().data()
-dig1=myTree.getNode("GPI.APD_ARRAY.HARDWARE:DT132_1.INPUT_01").getData().data()
-t1=myTree.getNode("GPI.APD_ARRAY.HARDWARE:DT132_1.INPUT_01").dim_of().data()
+HV_prog=myTree.getNode("GPI.APD_ARRAY.HARDWARE:ACQ196AO.OUTPUT_07").getData().data()
+t_prog=myTree.getNode("GPI.APD_ARRAY.HARDWARE:ACQ196AO.OUTPUT_07").dim_of().data()
+HV_meas=myTree.getNode("GPI.APD_ARRAY.HARDWARE:ACQ196.INPUT_07").getData().data()
+t_meas=myTree.getNode("GPI.APD_ARRAY.HARDWARE:ACQ196.INPUT_07").dim_of().data()
 print(str(len(HV_meas)))
 plt.plot(t_prog,HV_prog,".-")
 plt.plot(t_meas,HV_meas,".-")
-plt.plot(t1,dig1,".-")
 plt.show()
 
 """

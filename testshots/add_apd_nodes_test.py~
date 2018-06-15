@@ -49,7 +49,7 @@ node_hardware.addDevice("ACQ132_4","acq132")
 
 #Add a node for HV measured array
 node_result.addNode("HV_MEAS_ARR","numeric")
-hv_meas_arr_str="_hv_meas=[MEAN("
+hv_meas_arr_str="_hv_meas=[MAX("
 for i in range (1,9):
     #Add nodes for HV programmed values, 8 for 8 cathodes
     node_control.addNode("HV_PROG_"+str(i),"numeric")
@@ -58,7 +58,7 @@ for i in range (1,9):
 #    node_hardware.getNode("ACQ196AO.OUTPUT_0"+str(i)).putData(myTree.tdiCompile("Build_Signal(["+node_control.getNode("HV_PROG_"+str(i)).getFullPath()+","+node_control.getNode("HV_PROG_"+str(i)).getFullPath()+"],*,["+node_control.getNode("DIG_TSTART").getFullPath()+"-1.0,"+node_control.getNode("DIG_TSTOP").getFullPath()+"+1.0])"))
     hv_meas_arr_str=hv_meas_arr_str+node_control.getNode("HV_PROG_"+str(i)).getFullPath()+")"
     if i!=8:
-        hv_meas_arr_str=hv_meas_arr_str+",MEAN("
+        hv_meas_arr_str=hv_meas_arr_str+",MAX("
     else:
         hv_meas_arr_str=hv_meas_arr_str+"],_hv_meas_arr=["
 
@@ -81,7 +81,7 @@ node_control.getNode("FILTER").addNode("VALUE","text")
 node_control.getNode("FILTER.COMMENT").putData("values of filters: DA6563, HEI5876, HEI6670, HEII4686, OPEN")
 node_control.getNode("FILTER.VALUE").putData("HEI5876")
 
-#Add S_LAMBDA arrays for each filter. Brightness is obtained by multiplying S_LAMBDA with the inverse GAIN array and .
+#Add S_LAMBDA arrays for each filter. Brightness = (S_LAMBDA / GAIN_ARR) X (BACK_ARR-SIG_ARR)
 node_calib.addNode("S_L_DA6563","numeric")
 node_calib.addNode("S_L_HEI5876","numeric")
 node_calib.addNode("S_L_HEI6670","numeric")

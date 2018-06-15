@@ -49,7 +49,7 @@ node_hardware.addDevice("ACQ132_4","acq132")
 
 #Add a node for HV measured array
 node_result.addNode("HV_MEAS_ARR","numeric")
-hv_meas_arr_str="_hv_meas=[MEAN("
+hv_meas_arr_str="_hv_meas=[MAXVAL("
 for i in range (1,9):
     #Add nodes for HV programmed values, 8 for 8 cathodes
     node_control.addNode("HV_PROG_"+str(i),"numeric")
@@ -58,7 +58,7 @@ for i in range (1,9):
 #    node_hardware.getNode("ACQ196AO.OUTPUT_0"+str(i)).putData(myTree.tdiCompile("Build_Signal(["+node_control.getNode("HV_PROG_"+str(i)).getFullPath()+","+node_control.getNode("HV_PROG_"+str(i)).getFullPath()+"],*,["+node_control.getNode("DIG_TSTART").getFullPath()+"-1.0,"+node_control.getNode("DIG_TSTOP").getFullPath()+"+1.0])"))
     hv_meas_arr_str=hv_meas_arr_str+node_control.getNode("HV_PROG_"+str(i)).getFullPath()+")"
     if i!=8:
-        hv_meas_arr_str=hv_meas_arr_str+",MEAN("
+        hv_meas_arr_str=hv_meas_arr_str+",MAXVAL("
     else:
         hv_meas_arr_str=hv_meas_arr_str+"],_hv_meas_arr=["
 

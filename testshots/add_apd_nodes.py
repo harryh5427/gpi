@@ -46,7 +46,7 @@ node_hardware.addDevice("ACQ132_4","acq132")
 
 #Add a node for HV measured array
 node_result.addNode("HV_MEAS_ARR","numeric")
-hv_meas_arr_str="_hv_meas=[MAX("
+hv_meas_arr_str="_hv_meas=[MAXVAL("
 for i in range (1,9):
     #Add nodes for HV programmed values, 8 for 8 cathodes
     node_control.addNode("HV_PROG_"+str(i),"numeric")
@@ -54,7 +54,7 @@ for i in range (1,9):
     node_hardware.getNode("ACQ196AO.OUTPUT_0"+str(i)).putData(myTree.tdiCompile("Build_Signal([0.,1.,1.,0.]*"+node_control.getNode("HV_PROG_"+str(i)).getFullPath()+",*,[0.,1.,"+node_control.getNode("DIG_TSTOP").getFullPath()+"-"+node_hardware.getNode("DIO2.CHANNEL_1.TRIGGER_1").getFullPath()+"+1.0,"+node_control.getNode("DIG_TSTOP").getFullPath()+"-"+node_hardware.getNode("DIO2.CHANNEL_1.TRIGGER_1").getFullPath()+"+2.0])"))
     hv_meas_arr_str=hv_meas_arr_str+node_hardware.getNode("ACQ196.INPUT_0"+str(i)).getFullPath()+")"
     if i!=8:
-        hv_meas_arr_str=hv_meas_arr_str+",MAX("
+        hv_meas_arr_str=hv_meas_arr_str+",MAXVAL("
     else:
         hv_meas_arr_str=hv_meas_arr_str+"],_hv_meas_arr=["
 
@@ -157,7 +157,7 @@ node_hardware.getNode("ACQ196.DI3").putData(myTree.tdiCompile(gpi_root+".APD_ARR
 node_hardware.getNode("ACQ196.DI3.BUS").putData("fpga")
 node_hardware.getNode("ACQ196.DI3.WIRE").putData("lemo")
 node_hardware.getNode("ACQ196.NODE").putData("192.168.0.194")
-node_hardware.getNode("ACQ196.POST_TRIG").putData(myTree.tdiCompile("INT(("+gpi_root+".APD_ARRAY:DIG_TSTOP - "+gpi_root+".APD_ARRAY.HARDWARE:DIO2.CHANNEL_1:TRIGGER_1 + 5.) * "+gpi_root+".APD_ARRAY.HARDWARE:ACQ196:CLOCK_FREQ / 1024)"))
+node_hardware.getNode("ACQ196.POST_TRIG").putData(myTree.tdiCompile("INT(("+gpi_root+".APD_ARRAY.CONTROL:DIG_TSTOP - "+gpi_root+".APD_ARRAY.HARDWARE:DIO2.CHANNEL_1:TRIGGER_1 + 3.) * "+gpi_root+".APD_ARRAY.HARDWARE:ACQ196:CLOCK_FREQ / 1024)"))
 node_hardware.getNode("ACQ196.PRE_TRIG").putData(0)
 node_hardware.getNode("ACQ196.TRIG_EDGE").putData("RISING")
 node_hardware.getNode("ACQ196.TRIG_SRC").putData(myTree.tdiCompile(gpi_root+".APD_ARRAY:HARDWARE:ACQ196:DI3"))
@@ -208,7 +208,7 @@ node_hardware.getNode("DIO2.CHANNEL_2.TRIG_MODE").putData("SOFTWARE")
 node_hardware.getNode("DIO2.CHANNEL_3.CLOCK").putData(myTree.tdiCompile("* : * : 500E-9"))
 node_hardware.getNode("DIO2.CHANNEL_3.COMMENT").putData("clock for outerwall APD system")
 node_hardware.getNode("DIO2.CHANNEL_3.CYCLIC").putData("NO")
-node_hardware.getNode("DIO2.CHANNEL_3.FREQUENCY_1").putData(myTree.tdiCompile(gpi_root+".APD_ARRAY:DIG_FREQ * 1000E3"))
+node_hardware.getNode("DIO2.CHANNEL_3.FREQUENCY_1").putData(myTree.tdiCompile(gpi_root+".APD_ARRAY.CONTROL:DIG_FREQ * 1000E3"))
 node_hardware.getNode("DIO2.CHANNEL_3.FREQUENCY_2").putData(1000)
 node_hardware.getNode("DIO2.CHANNEL_3.FUNCTION").putData("CLOCK")
 node_hardware.getNode("DIO2.CHANNEL_3.INIT_LEVEL_1").putData("LOW")
@@ -218,7 +218,6 @@ node_hardware.getNode("DIO2.CHANNEL_3.TRIGGER_1").putData(myTree.tdiCompile(gpi_
 node_hardware.getNode("DIO2.CHANNEL_3.TRIGGER_2").putData(myTree.tdiCompile(gpi_root+".APD_ARRAY.HARDWARE:DIO2.CHANNEL_3:TRIGGER_1 + "+gpi_root+".APD_ARRAY.HARDWARE:DIO2.CHANNEL_3:DURATION"))
 
 node_hardware.getNode("ACQ132_1.ACTIVE_CHAN").putData(32)
-node_hardware.getNode("ACQ132_1.CLOCK").putData(myTree.tdiCompile(gpi_root+".APD_ARRAY.HARDWARE:ACQ132_1:CLOCK_SRC"))
 node_hardware.getNode("ACQ132_1.CLOCK_EDGE").putData("rising")
 node_hardware.getNode("ACQ132_1.CLOCK_FREQ").putData(myTree.tdiCompile(gpi_root+".APD_ARRAY.HARDWARE:DIO2.CHANNEL_1:FREQUENCY_1"))
 node_hardware.getNode("ACQ132_1.CLOCK_SRC").putData(myTree.tdiCompile(gpi_root+".APD_ARRAY.HARDWARE:DT132_1:DI0"))
@@ -233,12 +232,11 @@ node_hardware.getNode("ACQ132_1.DI3").putData(myTree.tdiCompile("D_FLOAT("+gpi_r
 node_hardware.getNode("ACQ132_1.DI3.BUS").putData("fpga pxi")
 node_hardware.getNode("ACQ132_1.DI3.WIRE").putData("lemo")
 node_hardware.getNode("ACQ132_1.NODE").putData("192.168.0.4")
-node_hardware.getNode("ACQ132_1.POST_TRIG").putData(myTree.tdiCompile(gpi_root+".APD_ARRAY:DIG_SAMPS"))
+node_hardware.getNode("ACQ132_1.POST_TRIG").putData(myTree.tdiCompile(gpi_root+".APD_ARRAY.CONTROL:DIG_SAMPS"))
 node_hardware.getNode("ACQ132_1.TRIG_SRC").putData(myTree.tdiCompile(gpi_root+".APD_ARRAY.HARDWARE:ACQ132_1:DI3"))
 
 for i in range (2,5):
     node_hardware.getNode("ACQ132_"+str(i)+".ACTIVE_CHAN").putData(32)
-    node_hardware.getNode("ACQ132_"+str(i)+".CLOCK").putData(myTree.tdiCompile(gpi_root+".APD_ARRAY.HARDWARE:ACQ132_"+str(i)+":CLOCK_SRC"))
     node_hardware.getNode("ACQ132_"+str(i)+".CLOCK_EDGE").putData("rising")
     node_hardware.getNode("ACQ132_"+str(i)+".CLOCK_FREQ").putData(myTree.tdiCompile(gpi_root+".APD_ARRAY.HARDWARE:ACQ132_1:CLOCK_FREQ"))
     node_hardware.getNode("ACQ132_"+str(i)+".CLOCK_SRC").putData(myTree.tdiCompile(gpi_root+".APD_ARRAY.HARDWARE:DT132_"+str(i)+":DI0"))
@@ -246,11 +244,11 @@ for i in range (2,5):
     node_hardware.getNode("ACQ132_"+str(i)+".DI0").putData(myTree.tdiCompile(gpi_root+".APD_ARRAY.HARDWARE:ACQ132_1:DI0"))
     node_hardware.getNode("ACQ132_"+str(i)+".DI0.BUS").putData("fpga")
     node_hardware.getNode("ACQ132_"+str(i)+".DI0.WIRE").putData("pxi")
-    node_hardware.getNode("ACQ132_"+str(i)+".DI3").putData(myTree.tdiCompile(myTree.tdiCompile(gpi_root+".APD_ARRAY.HARDWARE:ACQ132_1:DI3")))
+    node_hardware.getNode("ACQ132_"+str(i)+".DI3").putData(myTree.tdiCompile(gpi_root+".APD_ARRAY.HARDWARE:ACQ132_1:DI3"))
     node_hardware.getNode("ACQ132_"+str(i)+".DI3.BUS").putData("fpga")
     node_hardware.getNode("ACQ132_"+str(i)+".DI3.WIRE").putData("pxi")
     node_hardware.getNode("ACQ132_"+str(i)+".NODE").putData("192.168.0.4"+str(i-2))
-    node_hardware.getNode("ACQ132_"+str(i)+".POST_TRIG").putData(myTree.tdiCompile(gpi_root+".APD_ARRAY:DIG_SAMPS"))
+    node_hardware.getNode("ACQ132_"+str(i)+".POST_TRIG").putData(myTree.tdiCompile(gpi_root+".APD_ARRAY.CONTROL:DIG_SAMPS"))
     node_hardware.getNode("ACQ132_"+str(i)+".TRIG_SRC").putData(myTree.tdiCompile(gpi_root+".APD_ARRAY.HARDWARE:ACQ132_"+str(i)+":DI3"))
 
 
