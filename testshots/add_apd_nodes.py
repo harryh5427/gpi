@@ -46,7 +46,7 @@ node_hardware.addDevice("ACQ132_4","acq132")
 
 #Add a node for HV measured array
 node_result.addNode("HV_MEAS_ARR","numeric")
-hv_meas_arr_str="_hv_meas=[MAXVAL("
+hv_meas_arr_str="_hv_meas=[200.*MAXVAL("
 for i in range (1,9):
     #Add nodes for HV programmed values, 8 for 8 cathodes
     node_control.addNode("HV_PROG_"+str(i),"numeric")
@@ -54,7 +54,7 @@ for i in range (1,9):
     node_hardware.getNode("ACQ196AO.OUTPUT_0"+str(i)).putData(myTree.tdiCompile("Build_Signal([0.,1.,1.,0.]*"+node_control.getNode("HV_PROG_"+str(i)).getFullPath()+",*,[0.,1.,"+node_control.getNode("DIG_TSTOP").getFullPath()+"-"+node_hardware.getNode("DIO2.CHANNEL_1.TRIGGER_1").getFullPath()+"+1.0,"+node_control.getNode("DIG_TSTOP").getFullPath()+"-"+node_hardware.getNode("DIO2.CHANNEL_1.TRIGGER_1").getFullPath()+"+2.0])"))
     hv_meas_arr_str=hv_meas_arr_str+node_hardware.getNode("ACQ196.INPUT_0"+str(i)).getFullPath()+")"
     if i!=8:
-        hv_meas_arr_str=hv_meas_arr_str+",MAXVAL("
+        hv_meas_arr_str=hv_meas_arr_str+",200.*MAXVAL("
     else:
         hv_meas_arr_str=hv_meas_arr_str+"],_hv_meas_arr=["
 
@@ -69,6 +69,13 @@ for i in range (1,9):
             hv_meas_arr_str=hv_meas_arr_str+"]"
 
 node_result.getNode("HV_MEAS_ARR").putData(myTree.tdiCompile(hv_meas_arr_str))
+
+#Put dummy values for remaining ACQ196AO channels
+for i in range (9,17):
+    if i<10:
+        node_hardware.getNode("ACQ196AO.OUTPUT_0"+str(i)).putData(myTree.tdiCompile(node_hardware.getNode("ACQ196AO.OUTPUT_01").getFullPath()))
+    else:
+        node_hardware.getNode("ACQ196AO.OUTPUT_"+str(i)).putData(myTree.tdiCompile(node_hardware.getNode("ACQ196AO.OUTPUT_01").getFullPath()))
 
 #Add a filter array, and nodes under it: VALUE and COMMENT
 node_control.addNode("FILTER","structure")
@@ -89,10 +96,13 @@ mean_sig_arr="["
 for i in range (0,120):
     if (i+1)%10==1:
         mean_sig_arr=mean_sig_arr+"["
-    if i%30+1<10:
-        mean_sig_arr=mean_sig_arr+"MEAN("+node_hardware.getNode("ACQ132_"+str(i/30+1)+".INPUT_0"+str(i%30+1)).getFullPath()+")"
+    chan_num=i%30+1
+    if chan_num>=16:
+        chan_num+=2
+    if chan_num<10:
+        mean_sig_arr=mean_sig_arr+"MEAN("+node_hardware.getNode("ACQ132_"+str(i/30+1)+".INPUT_0"+str(chan_num)).getFullPath()+")"
     else:
-        mean_sig_arr=mean_sig_arr+"MEAN("+node_hardware.getNode("ACQ132_"+str(i/30+1)+".INPUT_"+str(i%30+1)).getFullPath()+")"
+        mean_sig_arr=mean_sig_arr+"MEAN("+node_hardware.getNode("ACQ132_"+str(i/30+1)+".INPUT_"+str(chan_num)).getFullPath()+")"
     if (i+1)%10==0:
         mean_sig_arr=mean_sig_arr+"]"
     if i!=119:
@@ -108,10 +118,13 @@ sig_arr="["
 for i in range (0,120):
     if (i+1)%10==1:
         sig_arr=sig_arr+"["
-    if i%30+1<10:
-        sig_arr=sig_arr+node_hardware.getNode("ACQ132_"+str(i/30+1)+".INPUT_0"+str(i%30+1)).getFullPath()
+    chan_num=i%30+1
+    if chan_num>=16:
+        chan_num+=2
+    if chan_num<10:
+        sig_arr=sig_arr+node_hardware.getNode("ACQ132_"+str(i/30+1)+".INPUT_0"+str(chan_num)).getFullPath()
     else:
-        sig_arr=sig_arr+node_hardware.getNode("ACQ132_"+str(i/30+1)+".INPUT_"+str(i%30+1)).getFullPath()
+        sig_arr=sig_arr+node_hardware.getNode("ACQ132_"+str(i/30+1)+".INPUT_"+str(chan_num)).getFullPath()
     if (i+1)%10==0:
         sig_arr=sig_arr+"]"
     if i!=119:
@@ -143,7 +156,7 @@ filter_list=['DA6563','HEI5876','HEI6670','HEII4686','OPEN']
 for i in range (0,5):
     brt_arr=brt_arr+"IF(UPCASE("+node_control.getNode("FILTER.VALUE").getFullPath()+")=='"+filter_list[i]+"',_slambda="+node_calib.getNode("S_L_"+filter_list[i]).getFullPath()+"),"
 
-brt_arr=brt_arr+"_back_series=replicate([_back],2,size(_sig_series,0)),_sensitivity_series=replicate([_slambda/_gain],2,size(_sig_series,0)),_brt_series=(-_sig_series+_back_series)*_sensitivity_series"
+brt_arr=brt_arr+"_back_series=spread([_back],0,size(_sig_series,0)),_sensitivity_series=spread([_slambda/_gain],0,size(_sig_series,0)),_brt_series=(-_sig_series+_back_series)*_sensitivity_series"
 node_result.getNode("BRT_ARR").putData(myTree.tdiCompile(brt_arr))
 
 node_hardware.getNode("ACQ196.ACTIVE_CHAN").putData(96)
@@ -153,7 +166,7 @@ node_hardware.getNode("ACQ196.CLOCK_EDGE").putData("rising")
 node_hardware.getNode("ACQ196.CLOCK_OUT").putData(myTree.tdiCompile(gpi_root+".APD_ARRAY:HARDWARE:ACQ196:DI2"))
 node_hardware.getNode("ACQ196.CLOCK_SRC").putData(myTree.tdiCompile(gpi_root+".APD_ARRAY:HARDWARE:ACQ196:INT_CLOCK"))
 node_hardware.getNode("ACQ196.COMMENT").putData("GPI 196 note no a-to-d's, only analogue out (ao)")
-node_hardware.getNode("ACQ196.DI3").putData(myTree.tdiCompile(gpi_root+".APD_ARRAY:DIG_TSTART"))
+node_hardware.getNode("ACQ196.DI3").putData(myTree.tdiCompile(gpi_root+".APD_ARRAY.HARDWARE:DIO2.CHANNEL_1:TRIGGER_1"))
 node_hardware.getNode("ACQ196.DI3.BUS").putData("fpga")
 node_hardware.getNode("ACQ196.DI3.WIRE").putData("lemo")
 node_hardware.getNode("ACQ196.NODE").putData("192.168.0.194")
@@ -172,7 +185,7 @@ node_hardware.getNode("ACQ196AO.MAX_SAMPLES").putData(16384)
 node_hardware.getNode("ACQ196AO.NODE").putData("192.168.0.194")
 node_hardware.getNode("ACQ196AO.TRIG_TYPE").putData("HARD_TRIG")
 
-node_hardware.getNode("DIO2.CLOCK_SOURCE").putData("HIGHWAY")
+node_hardware.getNode("DIO2.CLOCK_SOURCE").putData("INTERNAL")
 node_hardware.getNode("DIO2.COMMENT").putData("triggers and clocks for APD systems")
 node_hardware.getNode("DIO2.SW_MODE").putData("REMOTE")
 node_hardware.getNode("DIO2.SYNCH").putData("NO")
@@ -219,7 +232,7 @@ node_hardware.getNode("DIO2.CHANNEL_3.TRIGGER_2").putData(myTree.tdiCompile(gpi_
 
 node_hardware.getNode("ACQ132_1.ACTIVE_CHAN").putData(32)
 node_hardware.getNode("ACQ132_1.CLOCK_EDGE").putData("rising")
-node_hardware.getNode("ACQ132_1.CLOCK_FREQ").putData(myTree.tdiCompile(gpi_root+".APD_ARRAY.HARDWARE:DIO2.CHANNEL_1:FREQUENCY_1"))
+node_hardware.getNode("ACQ132_1.CLOCK_FREQ").putData(myTree.tdiCompile(gpi_root+".APD_ARRAY.HARDWARE:DIO2.CHANNEL_3:FREQUENCY_1"))
 node_hardware.getNode("ACQ132_1.CLOCK_SRC").putData(myTree.tdiCompile(gpi_root+".APD_ARRAY.HARDWARE:DT132_1:DI0"))
 node_hardware.getNode("ACQ132_1.COMMENT").putData("Dtaq 32-channel 2 MSPS digitizer")
 node_hardware.getNode("ACQ132_1.DI0").putData(myTree.tdiCompile(gpi_root+".APD_ARRAY.HARDWARE:DIO2.CHANNEL_3:CLOCK"))

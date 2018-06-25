@@ -19,7 +19,7 @@ s=int(sys.argv[1])
 myTree=Tree("spectroscopy",-1)
 myTree.createPulse(s) #Copies the model tree
 myTree=Tree("spectroscopy",s)
-myDIO2=myTree.getNode("GPI.APD_ARRAY.HARDWARE:DIO2")
+myDIO2=myTree.getNode("GPI_TCV.APD_ARRAY.HARDWARE:DIO2")
 
 #Initialize DIO2 through TCL command, since there is no working python command for DIO2
 #DIO2_ENCDEC does not work for this, neither does DIO4
@@ -29,13 +29,13 @@ print("Initialized DIO2")
 
 #Take node of each digitizer, and initialize them
 
-myACQ196AO=myTree.getNode("GPI.APD_ARRAY.HARDWARE:ACQ196AO")
+myACQ196AO=myTree.getNode("GPI_TCV.APD_ARRAY.HARDWARE:ACQ196AO")
 inst_ACQ196AO=ACQ196AO(myACQ196AO)
 inst_ACQ196AO.getstate()
 inst_ACQ196AO.init()
 print("Initialized ACQ196AO")
 
-myACQ196=myTree.getNode("GPI.APD_ARRAY.HARDWARE:ACQ196")
+myACQ196=myTree.getNode("GPI_TCV.APD_ARRAY.HARDWARE:ACQ196")
 inst_ACQ196=ACQ196(myACQ196)
 inst_ACQ196.initftp()
 print("Initialized ACQ196")
@@ -74,14 +74,14 @@ inst_ACQ196.store()
 print("Stored data on ACQ196")
 inst_ACQ196.getstate()
 
-HV_prog=myTree.getNode("GPI.APD_ARRAY.HARDWARE:ACQ196AO.OUTPUT_07").getData().data()
-t_prog=myTree.getNode("GPI.APD_ARRAY.HARDWARE:ACQ196AO.OUTPUT_07").dim_of().data()
-HV_meas=myTree.getNode("GPI.APD_ARRAY.HARDWARE:ACQ196.INPUT_07").getData().data()
-t_meas=myTree.getNode("GPI.APD_ARRAY.HARDWARE:ACQ196.INPUT_07").dim_of().data()
-print(str(len(HV_meas)))
-plt.plot(t_prog,HV_prog,".-")
-plt.plot(t_meas,HV_meas,".-")
-plt.show()
+#HV_prog=myTree.getNode("GPI.APD_ARRAY.HARDWARE:ACQ196AO.OUTPUT_07").getData().data()
+#t_prog=myTree.getNode("GPI.APD_ARRAY.HARDWARE:ACQ196AO.OUTPUT_07").dim_of().data()
+#HV_meas=myTree.getNode("GPI.APD_ARRAY.HARDWARE:ACQ196.INPUT_07").getData().data()
+#t_meas=myTree.getNode("GPI.APD_ARRAY.HARDWARE:ACQ196.INPUT_07").dim_of().data()
+#print(str(len(HV_meas)))
+#plt.plot(t_prog,HV_prog,".-")
+#plt.plot(t_meas,HV_meas,".-")
+#plt.show()
 
 """
 

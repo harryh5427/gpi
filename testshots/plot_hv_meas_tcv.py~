@@ -1,0 +1,32 @@
+from MDSplus import *
+import numpy as np
+import sys
+import matplotlib.pyplot as plt
+
+s=int(sys.argv[1])
+myTree=Tree("spectroscopy",s)
+hv_meas_1=myTree.getNode('gpi_tcv.apd_array.hardware.acq196.input_01').getData().data()
+hv_meas_2=myTree.getNode('gpi_tcv.apd_array.hardware.acq196.input_02').getData().data()
+hv_meas_3=myTree.getNode('gpi_tcv.apd_array.hardware.acq196.input_03').getData().data()
+hv_meas_4=myTree.getNode('gpi_tcv.apd_array.hardware.acq196.input_04').getData().data()
+hv_meas_5=myTree.getNode('gpi_tcv.apd_array.hardware.acq196.input_05').getData().data()
+hv_meas_6=myTree.getNode('gpi_tcv.apd_array.hardware.acq196.input_06').getData().data()
+t1=myTree.getNode('gpi_tcv.apd_array.hardware.acq196.input_01').dim_of().data()
+t2=myTree.getNode('gpi_tcv.apd_array.hardware.acq196.input_02').dim_of().data()
+t3=myTree.getNode('gpi_tcv.apd_array.hardware.acq196.input_03').dim_of().data()
+t4=myTree.getNode('gpi_tcv.apd_array.hardware.acq196.input_04').dim_of().data()
+t5=myTree.getNode('gpi_tcv.apd_array.hardware.acq196.input_05').dim_of().data()
+t6=myTree.getNode('gpi_tcv.apd_array.hardware.acq196.input_06').dim_of().data()
+
+hv_prog=myTree.getNode('gpi_tcv.apd_array.control.hv_prog_1').getData().data()
+
+plt.xlabel('Time (sec)')
+plt.ylabel('HV_meas (V)')
+plt.plot(t1,hv_meas_1)
+plt.plot(t2,hv_meas_2)
+plt.plot(t3,hv_meas_3)
+plt.plot(t4,hv_meas_4)
+plt.plot(t5,hv_meas_5)
+plt.plot(t6,hv_meas_6)
+plt.show()
+
