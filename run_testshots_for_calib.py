@@ -22,11 +22,8 @@ while True:
         break
 
 gpi_root="\SPECTROSCOPY::TOP.GPI_TCV"
-dead_channels=[79,89,105]
-half_dead_channels=[53]
-HV_prog_pool=np.linspace(3.0,4.2,num_shot)
+HV_prog=np.linspace(3.0,4.2,num_shot)
 HV_meas=[[],[],[],[],[],[],[],[]]
-HV_prog=[[],[],[],[],[],[],[],[]]
 filter_list=['DA6563','HEI5876','HEI6670','HEII4686','OPEN']
 while True:
     data = input("What is the filter you use? Values of filters: 0 is Da6563, 1 is HeI5876, 2 is HeI6670, 3 is HeII4686, 4 is open : ")
@@ -46,10 +43,10 @@ for i in range (1,num_shot*2+1):
     modelTree.createPulse(s) #Copies the model tree
     myTree=Tree("spectroscopy",s)
     myTree.getNode(gpi_root+".APD_ARRAY.CONTROL.FILTER.VALUE").putData(filter_used)
-    myTree.getNode(gpi_root+".APD_ARRAY.CONTROL.DIG_TSTOP").putData(.2)
+    myTree.getNode(gpi_root+".APD_ARRAY.CONTROL.DIG_TSTOP").putData(.3)
     if i<=num_shot:    
-        HV_prog_i=random.choice(HV_prog_pool)
-        HV_prog_pool=np.delete(HV_prog_pool,np.where(HV_prog_pool==HV_prog_i))
+        HV_prog_i=random.choice(HV_prog)
+        HV_prog=np.delete(HV_prog,np.where(HV_prog==HV_prog_i))
     if i>num_shot:
         myTree_with_light=Tree("spectroscopy",s-num_shot)
         HV_prog_i=myTree_with_light.getNode(gpi_root+".APD_ARRAY.CONTROL.HV_PROG_1").getData().data()
@@ -154,14 +151,6 @@ for i in range (1,num_shot*2+1):
         HV_meas[5].append(HV_meas_arr[7][5])
         HV_meas[6].append(HV_meas_arr[9][0])
         HV_meas[7].append(HV_meas_arr[10][5])
-        HV_prog[0].append(myTree_with_light.getNode(gpi_root+".APD_ARRAY.CONTROL.HV_PROG_1").getData().data())
-        HV_prog[1].append(myTree_with_light.getNode(gpi_root+".APD_ARRAY.CONTROL.HV_PROG_2").getData().data())
-        HV_prog[2].append(myTree_with_light.getNode(gpi_root+".APD_ARRAY.CONTROL.HV_PROG_3").getData().data())
-        HV_prog[3].append(myTree_with_light.getNode(gpi_root+".APD_ARRAY.CONTROL.HV_PROG_4").getData().data())
-        HV_prog[4].append(myTree_with_light.getNode(gpi_root+".APD_ARRAY.CONTROL.HV_PROG_5").getData().data())
-        HV_prog[5].append(myTree_with_light.getNode(gpi_root+".APD_ARRAY.CONTROL.HV_PROG_6").getData().data())
-        HV_prog[6].append(myTree_with_light.getNode(gpi_root+".APD_ARRAY.CONTROL.HV_PROG_7").getData().data())
-        HV_prog[7].append(myTree_with_light.getNode(gpi_root+".APD_ARRAY.CONTROL.HV_PROG_8").getData().data())
         myTree_with_light.close()
     
     if i==num_shot:
@@ -177,33 +166,18 @@ dummy_arr=sig_minus_back #Just to copy the size of the array
 for i in range (0,12):
     for j in range (0,10):
         dummy_arr[i][j]=0.
-
-node_model_coef_0th_hv=modelTree.getNode(gpi_root+".APD_ARRAY.CALIBRATION.HV_CHECK.HVCOEF_0TH")
-node_model_coef_1st_hv=modelTree.getNode(gpi_root+".APD_ARRAY.CALIBRATION.HV_CHECK.HVCOEF_1ST")
 node_model_coef_0th=modelTree.getNode(gpi_root+".APD_ARRAY.CALIBRATION.COEF_0TH_ARR")
 node_model_coef_1st=modelTree.getNode(gpi_root+".APD_ARRAY.CALIBRATION.COEF_1ST_ARR")
 node_model_coef_2nd=modelTree.getNode(gpi_root+".APD_ARRAY.CALIBRATION.COEF_2ND_ARR")
 node_model_coef_3rd=modelTree.getNode(gpi_root+".APD_ARRAY.CALIBRATION.COEF_3RD_ARR")
 node_model_coef_4th=modelTree.getNode(gpi_root+".APD_ARRAY.CALIBRATION.COEF_4TH_ARR")
-node_model_coef_0th_gain=modelTree.getNode(gpi_root+".APD_ARRAY.CALIBRATION.HV_CHECK.GAINCOEF_0TH")
-node_model_coef_1st_gain=modelTree.getNode(gpi_root+".APD_ARRAY.CALIBRATION.HV_CHECK.GAINCOEF_1ST")
-node_model_coef_2nd_gain=modelTree.getNode(gpi_root+".APD_ARRAY.CALIBRATION.HV_CHECK.GAINCOEF_2ND")
-node_model_coef_3rd_gain=modelTree.getNode(gpi_root+".APD_ARRAY.CALIBRATION.HV_CHECK.GAINCOEF_3RD")
-node_model_coef_4th_gain=modelTree.getNode(gpi_root+".APD_ARRAY.CALIBRATION.HV_CHECK.GAINCOEF_4TH")
 node_model_s_lambda_arr=modelTree.getNode(gpi_root+".APD_ARRAY.CALIBRATION.S_L_"+str(filter_used))
 node_model_back_arr=modelTree.getNode(gpi_root+".APD_ARRAY.CALIBRATION.BACK_ARR")
-node_model_coef_0th_hv.putData(modelTree.tdiCompile(str(dummy_arr.tolist())))
-node_model_coef_1st_hv.putData(modelTree.tdiCompile(str(dummy_arr.tolist())))
 node_model_coef_0th.putData(modelTree.tdiCompile(str(dummy_arr.tolist())))
 node_model_coef_1st.putData(modelTree.tdiCompile(str(dummy_arr.tolist())))
 node_model_coef_2nd.putData(modelTree.tdiCompile(str(dummy_arr.tolist())))
 node_model_coef_3rd.putData(modelTree.tdiCompile(str(dummy_arr.tolist())))
 node_model_coef_4th.putData(modelTree.tdiCompile(str(dummy_arr.tolist())))
-node_model_coef_0th_gain.putData(modelTree.tdiCompile(str(dummy_arr.tolist())))
-node_model_coef_1st_gain.putData(modelTree.tdiCompile(str(dummy_arr.tolist())))
-node_model_coef_2nd_gain.putData(modelTree.tdiCompile(str(dummy_arr.tolist())))
-node_model_coef_3rd_gain.putData(modelTree.tdiCompile(str(dummy_arr.tolist())))
-node_model_coef_4th_gain.putData(modelTree.tdiCompile(str(dummy_arr.tolist())))
 node_model_s_lambda_arr.putData(modelTree.tdiCompile(str(dummy_arr.tolist())))
 node_model_back_arr.putData(modelTree.tdiCompile(str(dummy_arr.tolist())))
 
@@ -224,27 +198,13 @@ for i in range (0,120):
     node_model_back_arr.putData(back_arr)
 
     HV_meas_sorted=HV_meas[i/15]
-    HV_prog_sorted=HV_prog[i/15]
+    sort_ind=np.argsort(HV_meas_sorted)
     HV_meas_sorted=np.sort(HV_meas_sorted)
-    sort_ind=np.argsort(HV_prog_sorted)
-    HV_prog_sorted=np.sort(HV_prog_sorted)
     temp=np.array([])
     for j in range (0,len(sig_minus_back)):
         temp=np.append(temp,sig_minus_back[sort_ind[j]])
     sig_minus_back=temp
-    
-    coef_hv=np.polyfit(HV_meas_sorted,HV_prog_sorted,1)
-    coef_0th_hv_arr=node_model_coef_0th_hv.getData().data()
-    coef_1st_hv_arr=node_model_coef_1st_hv.getData().data()
-    coef_0th_hv_arr[i/10][i%10]=coef_hv[1]
-    coef_1st_hv_arr[i/10][i%10]=coef_hv[0]
-    if math.isnan(coef_hv[1]) or math.isinf(coef_hv[1]):
-        coef_0th_hv_arr[i/10][i%10]=coef_0th_hv_arr[0][0]
-    if math.isnan(coef_hv[0]) or math.isinf(coef_hv[0]):
-        coef_1st_hv_arr[i/10][i%10]=coef_1st_hv_arr[0][0]
-    node_model_coef_0th_hv.putData(modelTree.tdiCompile(str(coef_0th_hv_arr.tolist())))
-    node_model_coef_1st_hv.putData(modelTree.tdiCompile(str(coef_1st_hv_arr.tolist())))
-    
+
     coef=np.polyfit(HV_meas_sorted,np.log(sig_minus_back),4)
     coef_0th_arr=node_model_coef_0th.getData().data()
     coef_1st_arr=node_model_coef_1st.getData().data()
@@ -256,64 +216,30 @@ for i in range (0,120):
     coef_2nd_arr[i/10][i%10]=coef[2]
     coef_3rd_arr[i/10][i%10]=coef[1]
     coef_4th_arr[i/10][i%10]=coef[0]
-    if math.isnan(coef[4]) or math.isinf(coef[4]):
+    if math.isnan(coef[4]) or math.isinf(coef[0]):
         coef_0th_arr[i/10][i%10]=coef_0th_arr[0][0]
-    if math.isnan(coef[3]) or math.isinf(coef[3]):
+    if math.isnan(coef[3]) or math.isinf(coef[1]):
         coef_1st_arr[i/10][i%10]=coef_1st_arr[0][0]
     if math.isnan(coef[2]) or math.isinf(coef[2]):
         coef_2nd_arr[i/10][i%10]=coef_2nd_arr[0][0]
-    if math.isnan(coef[1]) or math.isinf(coef[1]):
+    if math.isnan(coef[1]) or math.isinf(coef[3]):
         coef_3rd_arr[i/10][i%10]=coef_3rd_arr[0][0]
-    if math.isnan(coef[0]) or math.isinf(coef[0]):
+    if math.isnan(coef[0]) or math.isinf(coef[4]):
         coef_4th_arr[i/10][i%10]=coef_4th_arr[0][0]
     node_model_coef_0th.putData(modelTree.tdiCompile(str(coef_0th_arr.tolist())))
     node_model_coef_1st.putData(modelTree.tdiCompile(str(coef_1st_arr.tolist())))
     node_model_coef_2nd.putData(modelTree.tdiCompile(str(coef_2nd_arr.tolist())))
     node_model_coef_3rd.putData(modelTree.tdiCompile(str(coef_3rd_arr.tolist())))
     node_model_coef_4th.putData(modelTree.tdiCompile(str(coef_4th_arr.tolist())))
-    
-    coef_gain=np.polyfit(np.log(sig_minus_back),HV_meas_sorted,4)
-    coef_0th_gain_arr=node_model_coef_0th.getData().data()
-    coef_1st_gain_arr=node_model_coef_1st.getData().data()
-    coef_2nd_gain_arr=node_model_coef_2nd.getData().data()
-    coef_3rd_gain_arr=node_model_coef_3rd.getData().data()
-    coef_4th_gain_arr=node_model_coef_4th.getData().data()
-    coef_0th_gain_arr[i/10][i%10]=coef_gain[4]
-    coef_1st_gain_arr[i/10][i%10]=coef_gain[3]
-    coef_2nd_gain_arr[i/10][i%10]=coef_gain[2]
-    coef_3rd_gain_arr[i/10][i%10]=coef_gain[1]
-    coef_4th_gain_arr[i/10][i%10]=coef_gain[0]
-    if math.isnan(coef_gain[4]) or math.isinf(coef_gain[4]):
-        coef_0th_gain_arr[i/10][i%10]=coef_0th_gain_arr[0][0]
-    if math.isnan(coef_gain[3]) or math.isinf(coef_gain[3]):
-        coef_1st_gain_arr[i/10][i%10]=coef_1st_gain_arr[0][0]
-    if math.isnan(coef_gain[2]) or math.isinf(coef_gain[2]):
-        coef_2nd_gain_arr[i/10][i%10]=coef_2nd_gain_arr[0][0]
-    if math.isnan(coef_gain[1]) or math.isinf(coef_gain[1]):
-        coef_3rd_gain_arr[i/10][i%10]=coef_3rd_gain_arr[0][0]
-    if math.isnan(coef_gain[0]) or math.isinf(coef_gain[0]):
-        coef_4th_gain_arr[i/10][i%10]=coef_4th_gain_arr[0][0]
-    node_model_coef_0th_gain.putData(modelTree.tdiCompile(str(coef_0th_gain_arr.tolist())))
-    node_model_coef_1st_gain.putData(modelTree.tdiCompile(str(coef_1st_gain_arr.tolist())))
-    node_model_coef_2nd_gain.putData(modelTree.tdiCompile(str(coef_2nd_gain_arr.tolist())))
-    node_model_coef_3rd_gain.putData(modelTree.tdiCompile(str(coef_3rd_gain_arr.tolist())))
-    node_model_coef_4th_gain.putData(modelTree.tdiCompile(str(coef_4th_gain_arr.tolist())))
 
 for i in range (1,num_shot*2+1):
     myTree=Tree("spectroscopy",s-2*num_shot+i)
     myTree.getNode(gpi_root+".APD_ARRAY.CALIBRATION.BACK_ARR").putData(myTree.tdiCompile(str(node_model_back_arr.getData().data().tolist())))
-    myTree.getNode(gpi_root+".APD_ARRAY.CALIBRATION.HV_CHECK.HVCOEF_0TH").putData(myTree.tdiCompile(str(node_model_coef_0th_hv.getData().data().tolist())))
-    myTree.getNode(gpi_root+".APD_ARRAY.CALIBRATION.HV_CHECK.HVCOEF_1ST").putData(myTree.tdiCompile(str(node_model_coef_1st_hv.getData().data().tolist())))
     myTree.getNode(gpi_root+".APD_ARRAY.CALIBRATION.COEF_0TH_ARR").putData(myTree.tdiCompile(str(node_model_coef_0th.getData().data().tolist())))
     myTree.getNode(gpi_root+".APD_ARRAY.CALIBRATION.COEF_1ST_ARR").putData(myTree.tdiCompile(str(node_model_coef_1st.getData().data().tolist())))
     myTree.getNode(gpi_root+".APD_ARRAY.CALIBRATION.COEF_2ND_ARR").putData(myTree.tdiCompile(str(node_model_coef_2nd.getData().data().tolist())))
     myTree.getNode(gpi_root+".APD_ARRAY.CALIBRATION.COEF_3RD_ARR").putData(myTree.tdiCompile(str(node_model_coef_3rd.getData().data().tolist())))
     myTree.getNode(gpi_root+".APD_ARRAY.CALIBRATION.COEF_4TH_ARR").putData(myTree.tdiCompile(str(node_model_coef_4th.getData().data().tolist())))
-    myTree.getNode(gpi_root+".APD_ARRAY.CALIBRATION.HV_CHECK.GAINCOEF_0TH").putData(myTree.tdiCompile(str(node_model_coef_0th_gain.getData().data().tolist())))
-    myTree.getNode(gpi_root+".APD_ARRAY.CALIBRATION.HV_CHECK.GAINCOEF_1ST").putData(myTree.tdiCompile(str(node_model_coef_1st_gain.getData().data().tolist())))
-    myTree.getNode(gpi_root+".APD_ARRAY.CALIBRATION.HV_CHECK.GAINCOEF_2ND").putData(myTree.tdiCompile(str(node_model_coef_2nd_gain.getData().data().tolist())))
-    myTree.getNode(gpi_root+".APD_ARRAY.CALIBRATION.HV_CHECK.GAINCOEF_3RD").putData(myTree.tdiCompile(str(node_model_coef_3rd_gain.getData().data().tolist())))
-    myTree.getNode(gpi_root+".APD_ARRAY.CALIBRATION.HV_CHECK.GAINCOEF_4TH").putData(myTree.tdiCompile(str(node_model_coef_4th_gain.getData().data().tolist())))
     myTree.close()
 
 for i in range (0,120):

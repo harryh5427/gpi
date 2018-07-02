@@ -89,6 +89,18 @@ print("Stored data on ACQ132_4")
 
 inst_ACQ196.store()
 print("Stored data on ACQ196")
+
+for i in range (1,5):
+    for j in range (1,33):
+        if j<10:
+            sig=myTree.getNode('gpi_tcv.apd_array.hardware.acq132_'+str(i)+'.input_0'+str(j)).getData().data()
+#            t=myTree.getNode('gpi_tcv.apd_array.hardware.dt132_'+str(i)+'.input_0'+str(j)).dim_of().data()
+        else:
+            sig=myTree.getNode('gpi_tcv.apd_array.hardware.acq132_'+str(i)+'.input_'+str(j)).getData().data()
+#            t=myTree.getNode('gpi_tcv.apd_array.hardware.dt132_'+str(i)+'.input_'+str(j)).dim_of().data()
+        print("ACQ132_"+str(i)+", Input "+str(j)+": "+str(np.mean(sig)))
+
+
 """
 for i in range (1,17):
     if i < 10:

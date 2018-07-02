@@ -172,17 +172,16 @@ node_result.getNode("BRT_ARR").putData(myTree.tdiCompile(brt_arr))
 
 #Add HV_CHECK structure node
 node_calib.addNode("HV_CHECK","structure")
-node_hvcheck=node_calib.getNode("HV_CHECK")
-node_hvcheck.addNode("GAINCOEF_0TH","numeric")
-node_hvcheck.addNode("GAINCOEF_1ST","numeric")
-node_hvcheck.addNode("GAINCOEF_2ND","numeric")
-node_hvcheck.addNode("GAINCOEF_3RD","numeric")
-node_hvcheck.addNode("GAINCOEF_4TH","numeric")
-node_hvcheck.addNode("HVCOEF_0TH","numeric")
-node_hvcheck.addNode("HVCOEF_1ST","numeric")
-node_hvcheck.addNode("GAIN_GOAL","numeric")
-node_hvcheck.addNode("HVMEAS_REQ","numeric")
-node_hvcheck.addNode("HVPROG_REQ","numeric")
+node_calib.addNode("HV_CHECK.GAINCOEF_0TH","numeric")
+node_calib.addNode("HV_CHECK.GAINCOEF_1ST","numeric")
+node_calib.addNode("HV_CHECK.GAINCOEF_2ND","numeric")
+node_calib.addNode("HV_CHECK.GAINCOEF_3RD","numeric")
+node_calib.addNode("HV_CHECK.GAINCOEF_4TH","numeric")
+node_calib.addNode("HV_CHECK.HVCOEF_0TH","numeric")
+node_calib.addNode("HV_CHECK.HVCOEF_1ST","numeric")
+node_calib.addNode("HV_CHECK.GAIN_GOAL","numeric")
+node_calib.addNode("HV_CHECK.HVMEAS_REQ","numeric")
+node_calib.addNode("HV_CHECK.HVPROG_REQ","numeric")
 
 hvmeas_req="_vr=[409.5,412.8,403.5,392.5,391.1,390.3,421.8,426.2],_vr_arr=["
 for i in range (1,9):
@@ -195,7 +194,7 @@ for i in range (1,9):
         else:
             hvmeas_req=hvmeas_req+"]"
 
-hvmeas_req=hvmeas_req+",_c0="+node_calib.getNode("COEF_0TH_ARR").getFullPath()+",_c1="+node_calib.getNode("COEF_1ST_ARR").getFullPath()+",_c2="+node_calib.getNode("COEF_2ND_ARR").getFullPath()+",_c3="+node_calib.getNode("COEF_3RD_ARR").getFullPath()+",_c4="+node_calib.getNode("COEF_4TH_ARR").getFullPath()+",_gain_factor=exp(_c0+_c1*_vr_arr+_c2*_vr_arr^2+_c3*_vr_arr^3+_c4*_vr_arr^4)/67.49,_gain_goal="+node_hvcheck.getNode("GAIN_GOAL").getFullPath()+",_gain_goal_arr=["
+hvmeas_req=hvmeas_req+",_c0="+node_calib.getNode("COEF_0TH_ARR").getFullPath()+",_c1="+node_calib.getNode("COEF_1ST_ARR").getFullPath()+",_c2="+node_calib.getNode("COEF_2ND_ARR").getFullPath()+",_c3="+node_calib.getNode("COEF_3RD_ARR").getFullPath()+",_c4="+node_calib.getNode("COEF_4TH_ARR").getFullPath()+",_gain_factor=exp(_c0+_c1*_vr_arr+_c2*_vr_arr^2+_c3*_vr_arr^3+_c4*_vr_arr^4)/67.49,_gain_goal="+node_calib.getNode("HV_CHECK.GAIN_GOAL").getFullPath()+",_gain_goal_arr=["
 for i in range (1,9):
     if i%2==1:
         hvmeas_req=hvmeas_req+"replicate([_gain_goal["+str(i-1)+"]],0,10),"
@@ -206,10 +205,10 @@ for i in range (1,9):
         else:
             hvmeas_req=hvmeas_req+"]"
 
-hvmeas_req=hvmeas_req+",_c0g="+node_hvcheck.getNode("GAINCOEF_0TH").getFullPath()+",_c1g="+node_hvcheck.getNode("GAINCOEF_1ST").getFullPath()+",_c2g="+node_hvcheck.getNode("GAINCOEF_2ND").getFullPath()+",_c3g="+node_hvcheck.getNode("GAINCOEF_3RD").getFullPath()+",_c4g="+node_hvcheck.getNode("GAINCOEF_4TH").getFullPath()+",_hvmeas_req=_c0g+_c1g*log(_gain_goal_arr*_gain_factor)+_c2g*log(_gain_goal_arr*_gain_factor)^2+_c3g*log(_gain_goal_arr*_gain_factor)^3+_c4g*log(_gain_goal_arr*_gain_factor)^4"
-hvprog_req="_c0h="+node_hvcheck.getNode("HVCOEF_0TH").getFullPath()+",_c1h="+node_hvcheck.getNode("HVCOEF_1ST").getFullPath()+",_hvmeas_req="+node_hvcheck.getNode("HVMEAS_REQ").getFullPath()+",_hvprog_req=_c0h+_c1h*_hvmeas_req"
-node_hvcheck.getNode("HVMEAS_REQ").putData(myTree.tdiCompile(hvmeas_req))
-node_hvcheck.getNode("HVPROG_REQ").putData(myTree.tdiCompile(hvprog_req))
+hvmeas_req=hvmeas_req+",_c0g="+node_calib.getNode("HV_CHECK.GAINCOEF_0TH").getFullPath()+",_c1g="+node_calib.getNode("HV_CHECK.GAINCOEF_1ST").getFullPath()+",_c2g="+node_calib.getNode("HV_CHECK.GAINCOEF_2ND").getFullPath()+",_c3g="+node_calib.getNode("HV_CHECK.GAINCOEF_3RD").getFullPath()+",_c4g="+node_calib.getNode("HV_CHECK.GAINCOEF_4TH").getFullPath()+",_hvmeas_req=_c0g+_c1g*log(_gain_goal_arr*_gain_factor)+_c2g*log(_gain_goal_arr*_gain_factor)^2+_c3g*log(_gain_goal_arr*_gain_factor)^3+_c4g*log(_gain_goal_arr*_gain_factor)^4"
+hvprog_req="_c0h="+node_calib.getNode("HV_CHECK.HVCOEF_0TH").getFullPath()+",_c1h="+node_calib.getNode("HV_CHECK.HVCOEF_1ST").getFullPath()+",_hvmeas_req="+node_calib.getNode("HV_CHECK.HVMEAS_REQ").getFullPath()+",_hvprog_req=_c0h+_c1h*_hvmeas_req"
+node_calib.getNode("HV_CHECK.HVMEAS_REQ").putData(myTree.tdiCompile(hvmeas_req))
+node_calib.getNode("HV_CHECK.HVPROG_REQ").putData(myTree.tdiCompile(hvprog_req))
 
 node_hardware.getNode("ACQ196.ACTIVE_CHAN").putData(96)
 node_hardware.getNode("ACQ196.CLOCK_FREQ").putData(1000)
