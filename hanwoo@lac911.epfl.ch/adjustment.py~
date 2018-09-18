@@ -1,0 +1,54 @@
+from MDSplus import *
+import numpy as np
+import math
+
+for s in range (1,101):
+    myTree=Tree("spectroscopy",1180618600+s)
+    node_calib=myTree.getNode("gpi_tcv.apd_array.calibration")
+    node_hardware=myTree.getNode("gpi_tcv.apd_array.hardware")
+    node_result=myTree.getNode("gpi_tcv.apd_array.result")
+    mean_sig_arr="["
+    for i in range (0,120):
+        if (i+1)%10==1:
+            mean_sig_arr=mean_sig_arr+"["
+        chan_num=i%30+1
+        if chan_num>=16:
+            chan_num+=2
+        if chan_num<10:
+            mean_sig_arr=mean_sig_arr+"MEAN("+node_hardware.getNode("ACQ132_"+str(i/30+1)+".INPUT_0"+str(chan_num)).getFullPath()+")"
+        else:
+            mean_sig_arr=mean_sig_arr+"MEAN("+node_hardware.getNode("ACQ132_"+str(i/30+1)+".INPUT_"+str(chan_num)).getFullPath()+")"
+        if (i+1)%10==0:
+            mean_sig_arr=mean_sig_arr+"]"
+        if i!=119:
+            mean_sig_arr=mean_sig_arr+","
+        else:
+            mean_sig_arr=mean_sig_arr+"]"
+
+    node_calib.getNode("MEAN_SIG_ARR").putData(myTree.tdiCompile(mean_sig_arr))
+    
+    sig_arr="["
+    for i in range (0,120):
+        if (i+1)%10==1:
+            sig_arr=sig_arr+"["
+        chan_num=i%30+1
+        if chan_num>=16:
+            chan_num+=2
+        if chan_num<10:
+            sig_arr=sig_arr+node_hardware.getNode("ACQ132_"+str(i/30+1)+".INPUT_0"+str(chan_num)).getFullPath()
+        else:
+            sig_arr=sig_arr+node_hardware.getNode("ACQ132_"+str(i/30+1)+".INPUT_"+str(chan_num)).getFullPath()
+        if (i+1)%10==0:
+            sig_arr=sig_arr+"]"
+        if i!=119:
+            sig_arr=sig_arr+","
+        else:
+            sig_arr=sig_arr+"]"
+
+    node_result.getNode("SIG_ARR").putData(myTree.tdiCompile(sig_arr))
+    
+    for i in range (1,33):
+        if i<10:
+            node_hardware.getNode("ACQ132_4.INPUT_0"+str(i)).putData(myTree.tdiCompile(node_hardware.getNode("ACQ132_1.INPUT_0"+str(i)).getFullPath()))
+        else:
+            node_hardware.getNode("ACQ132_4.INPUT_"+str(i)).putData(myTree.tdiCompile(node_hardware.getNode("ACQ132_1.INPUT_"+str(i)).getFullPath()))
